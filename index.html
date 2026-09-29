@@ -1,0 +1,1730 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1020" />
+  <title>IncidentIQ | Smart Incident Management</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1020;
+      --sidebar: #0e162b;
+      --panel: #111a2e;
+      --panel-hover: #17233a;
+      --border: #26334d;
+      --text: #edf3ff;
+      --muted: #93a4c0;
+      --blue: #5b8cff;
+      --blue-soft: rgba(91, 140, 255, .13);
+      --green: #34d399;
+      --purple: #a78bfa;
+      --amber: #fbbf24;
+      --red: #fb7185;
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 85px;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "DM Sans", sans-serif;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { font-family: "Space Grotesk", sans-serif; }
+    a { color: inherit; text-decoration: none; }
+
+    .app { min-height: 100vh; }
+
+    /* Sidebar */
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: 246px;
+      display: flex;
+      flex-direction: column;
+      padding: 27px 17px 18px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      z-index: 20;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 10px;
+      margin-bottom: 39px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #367bff, #7458f6);
+      box-shadow: 0 8px 24px #4269e533;
+    }
+
+    .brand-mark i { width: 23px; height: 23px; }
+
+    .brand-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: -.8px;
+    }
+
+    .brand-name span { color: var(--blue); }
+
+    .brand-sub {
+      margin-top: 2px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .nav-label {
+      padding: 0 12px;
+      margin: 0 0 10px;
+      color: #7385a3;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 13px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      color: #a9b8d1;
+      transition: .2s ease;
+    }
+
+    .nav-link i { width: 18px; height: 18px; }
+    .nav-link:hover { background: var(--panel-hover); color: white; }
+
+    .nav-link.active {
+      color: #fff;
+      background: var(--blue-soft);
+      border-color: #385ca044;
+    }
+
+    .nav-link.active i { color: #83aaff; }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 15px;
+      border: 1px solid var(--border);
+      background: #111c31;
+      border-radius: 13px;
+    }
+
+    .mini-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #c5d2e7;
+      font-size: 12px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      display: inline-block;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 10px #34d39955;
+    }
+
+    .dot.busy { background: var(--amber); box-shadow: none; }
+    .dot.offline { background: var(--red); box-shadow: none; }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    .tech-tag {
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: #202d45;
+      color: #b8c9e4;
+      font-size: 10px;
+    }
+
+    /* Main layout */
+
+    .main {
+      min-width: 0;
+      margin-left: 246px;
+    }
+
+    .topbar {
+      min-height: 65px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 12px 30px;
+      background: #0e1628eF;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar-left, .topbar-right, .status-group {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: #14243a;
+      border: 1px solid #263d57;
+      border-radius: 20px;
+      color: #d7e5f9;
+      font-size: 12px;
+    }
+
+    .top-muted { color: var(--muted); font-size: 12px; }
+
+    .icon-button {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+      color: #d5e1f5;
+    }
+
+    .icon-button:hover { background: var(--panel-hover); }
+    .icon-button i { width: 17px; height: 17px; }
+
+    .avatar {
+      width: 33px;
+      height: 33px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3c6fe0, #8a64e8);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .content {
+      max-width: 1700px;
+      padding: 30px;
+      margin: 0 auto;
+    }
+
+    .welcome {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow {
+      margin-bottom: 8px;
+      color: #86a8ff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin-bottom: 7px;
+      font-size: clamp(25px, 3vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -1.1px;
+    }
+
+    .welcome p { margin-bottom: 0; color: var(--muted); }
+
+    .date-chip {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 9px;
+      color: #bdcbe1;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(290px, .85fr);
+      gap: 21px;
+      align-items: start;
+    }
+
+    .left-column, .right-column {
+      display: grid;
+      gap: 21px;
+      min-width: 0;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 21px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 8px 28px #0000000b;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .heading-main {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .heading-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--blue-soft);
+      color: #8db0ff;
+    }
+
+    .heading-icon i { width: 19px; height: 19px; }
+
+    .heading-icon.purple { background: #8b5cf621; color: #b8a0ff; }
+    .heading-icon.green { background: #34d3991c; color: #58dfae; }
+    .heading-icon.amber { background: #fbbf241a; color: #f6ca66; }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -.35px;
+    }
+
+    .panel-description {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .counter {
+      flex: 0 0 auto;
+      padding: 4px 8px;
+      background: #202d45;
+      border-radius: 7px;
+      color: #bfd0eb;
+      font-size: 11px;
+    }
+
+    .counter.blue { color: #a9c3ff; background: #3d67bf25; }
+    .counter.green { color: #73e6b8; background: #34d3991a; }
+
+    /* Form controls */
+
+    .field { margin-bottom: 16px; }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #d4dff0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .optional { color: #7588a7; font-weight: 400; }
+
+    textarea, select, input[type="text"] {
+      width: 100%;
+      border: 1px solid #30405b;
+      border-radius: 10px;
+      outline: none;
+      background: #0c1426;
+      color: var(--text);
+      transition: border .2s, box-shadow .2s;
+    }
+
+    textarea, input[type="text"] { padding: 12px 13px; }
+    textarea { resize: vertical; min-height: 130px; }
+    select { padding: 11px 12px; }
+
+    textarea::placeholder, input::placeholder { color: #667996; }
+
+    textarea:focus, select:focus, input:focus {
+      border-color: #608dff;
+      box-shadow: 0 0 0 3px #5b8cff1b;
+    }
+
+    .field-hint {
+      margin: 7px 0 0;
+      color: #7486a4;
+      font-size: 11px;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .keyboard-hint { color: #7285a2; font-size: 11px; }
+
+    .button-group { display: flex; flex-wrap: wrap; gap: 9px; }
+
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 10px 15px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      transition: transform .15s, background .15s;
+    }
+
+    .btn i { width: 15px; height: 15px; }
+    .btn:hover:not(:disabled) { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4d85ff, #4169e8);
+      color: white;
+      box-shadow: 0 5px 18px #4777ed20;
+    }
+
+    .btn-primary:hover:not(:disabled) { background: #6393ff; }
+
+    .btn-secondary {
+      border-color: #354867;
+      background: #18243a;
+      color: #d6e3f7;
+    }
+
+    .btn-secondary:hover:not(:disabled) { background: #22314b; }
+
+    .btn-success {
+      background: linear-gradient(135deg, #0f9e78, #0a886a);
+      color: white;
+    }
+
+    .btn-success:hover:not(:disabled) { background: #11ad83; }
+
+    .btn-quiet {
+      min-height: 32px;
+      padding: 6px 9px;
+      background: transparent;
+      border-color: var(--border);
+      color: #aebfda;
+      font-weight: 500;
+    }
+
+    .btn-full { width: 100%; }
+
+    .progress-line {
+      height: 3px;
+      margin-top: 17px;
+      overflow: hidden;
+      border-radius: 5px;
+      background: #25334b;
+    }
+
+    .progress-line span {
+      display: block;
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #548bff, #a78bfa);
+      transition: width .3s;
+    }
+
+    /* Memories */
+
+    .memory-list { display: grid; gap: 11px; }
+
+    .memory-card {
+      padding: 14px;
+      border: 1px solid #293750;
+      border-radius: 11px;
+      background: #0e1729;
+      transition: border .2s, background .2s;
+    }
+
+    .memory-card:hover { border-color: #3c5275; background: #111d32; }
+
+    .memory-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 9px;
+    }
+
+    .memory-title {
+      margin: 0;
+      color: #e0eaff;
+      font-size: 13px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .memory-summary {
+      margin: 7px 0 0;
+      color: #92a5c2;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .memory-detail {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: #b2c2da;
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .memory-card.expanded .memory-detail { display: block; }
+
+    .memory-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: #88aaff;
+      font-size: 11px;
+    }
+
+    .memory-toggle i { width: 13px; height: 13px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+      gap: 5px;
+      padding: 4px 7px;
+      border-radius: 6px;
+      background: #27354c;
+      color: #b7c8e2;
+      font-size: 10px;
+    }
+
+    .badge.resolved { color: #76e6b8; background: #1a493c; }
+    .badge.partial { color: #f4cc77; background: #493b20; }
+    .badge.unresolved { color: #fda4af; background: #482735; }
+
+    .empty-state {
+      padding: 32px 15px;
+      border: 1px dashed #34425b;
+      border-radius: 11px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      display: block;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 10px;
+      color: #7f91b0;
+    }
+
+    .empty-state strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #d2def1;
+      font-size: 13px;
+    }
+
+    .empty-state p { margin: 0; font-size: 12px; }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      border: 0;
+      background: transparent;
+      color: #91b0ff;
+      font-size: 12px;
+      padding: 0;
+    }
+
+    /* Troubleshooting plan */
+
+    .plan-intro {
+      margin: -4px 0 17px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .plan-list { display: grid; gap: 0; }
+
+    .plan-item {
+      position: relative;
+      display: grid;
+      grid-template-columns: 29px minmax(0, 1fr);
+      gap: 12px;
+      padding-bottom: 18px;
+    }
+
+    .plan-item:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 29px;
+      bottom: 2px;
+      width: 1px;
+      background: #344563;
+    }
+
+    .plan-number {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #4666a1;
+      border-radius: 9px;
+      background: #1d3155;
+      color: #a9c5ff;
+      font-size: 12px;
+      font-weight: 700;
+      z-index: 1;
+    }
+
+    .plan-title {
+      margin: 2px 0 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e2ebfa;
+      overflow-wrap: anywhere;
+    }
+
+    .plan-description {
+      margin: 0;
+      color: #92a5c1;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .plan-text {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: #cfdbed;
+      font-size: 13px;
+    }
+
+    .verification {
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .verification-heading {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .verification-heading i { color: var(--green); width: 17px; }
+
+    .verification ul {
+      padding-left: 20px;
+      margin: 0;
+      color: #b4c3d9;
+      font-size: 12px;
+    }
+
+    .verification li { margin: 7px 0; }
+
+    .note {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-top: 17px;
+      padding: 11px;
+      border: 1px solid #3c3d65;
+      border-radius: 9px;
+      background: #211d3a;
+      color: #c6c5ef;
+      font-size: 11px;
+    }
+
+    .note i { width: 16px; height: 16px; flex: 0 0 auto; color: #b7a5ff; }
+
+    /* Right-side workflow */
+
+    .workflow { display: grid; gap: 18px; }
+
+    .workflow-step {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 11px;
+      align-items: start;
+    }
+
+    .step-number {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #31435f;
+      border-radius: 10px;
+      background: #1b2b44;
+      color: #8db0ff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .workflow-step strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .workflow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .learning-callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid #245846;
+      border-radius: 10px;
+      background: #103329;
+      color: #8ce5bf;
+      font-size: 12px;
+    }
+
+    .learning-callout i { width: 19px; height: 19px; flex: 0 0 auto; }
+
+    .learning-callout p { margin: 0; }
+
+    .save-panel { border-color: #285044; }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin: 10px 0 16px;
+      color: #b7c6dc;
+      font-size: 12px;
+    }
+
+    .checkbox-row input {
+      margin-top: 3px;
+      accent-color: var(--green);
+    }
+
+    .checkbox-row:has(input:disabled) { opacity: .5; }
+
+    .save-hint {
+      margin: 10px 0 0;
+      color: #7f93ad;
+      font-size: 11px;
+    }
+
+    /* Notifications and footer */
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 50;
+      max-width: min(390px, calc(100vw - 32px));
+      padding: 13px 16px;
+      border: 1px solid #3b506f;
+      border-radius: 11px;
+      background: #17243a;
+      color: #eaf2ff;
+      box-shadow: 0 12px 40px #0005;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .2s;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-color: #814054; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding: 17px 19px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #8fa2bf;
+      font-size: 11px;
+    }
+
+    .footer-left { display: flex; align-items: center; gap: 8px; }
+    .footer-left i { width: 16px; color: var(--green); }
+
+    .mobile-menu { display: none; }
+
+    /* Responsive layout */
+
+    @media (max-width: 1150px) {
+      .sidebar { width: 215px; }
+      .main { margin-left: 215px; }
+      .content { padding: 22px; }
+      .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
+      .right-column { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        width: 246px;
+        transform: translateX(-100%);
+        transition: transform .25s;
+        box-shadow: 20px 0 60px #0004;
+      }
+
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .topbar { padding: 11px 15px; }
+      .top-muted, .user-label { display: none; }
+      .mobile-menu { display: grid; }
+      .content { padding: 19px 14px; }
+      .welcome { align-items: flex-start; }
+      .date-chip { display: none; }
+      .right-column { grid-template-columns: minmax(0, 1fr); }
+      .panel { padding: 16px; }
+      .form-footer { align-items: flex-start; }
+      .button-group { width: 100%; }
+      .button-group .btn { flex: 1; }
+      .footer { padding: 14px; }
+    }
+
+    @media (max-width: 420px) {
+      .topbar-right { gap: 7px; }
+      .status-pill { font-size: 11px; padding: 5px 8px; }
+      .panel-heading { gap: 7px; }
+      .heading-icon { width: 33px; height: 33px; }
+      .panel h2 { font-size: 15px; }
+      .button-group { flex-direction: column; }
+      .button-group .btn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <aside class="sidebar" id="sidebar">
+    <a href="#home" class="brand">
+      <div class="brand-mark"><i data-lucide="brain-circuit"></i></div>
+      <div>
+        <div class="brand-name">Incident<span>IQ</span></div>
+        <div class="brand-sub">Smarter incident response</div>
+      </div>
+    </a>
+
+    <div class="nav-label">Workspace</div>
+    <nav class="nav">
+      <a class="nav-link active" href="#home">
+        <i data-lucide="layout-dashboard"></i> Dashboard
+      </a>
+      <a class="nav-link" href="#incident">
+        <i data-lucide="activity"></i> New incident
+      </a>
+      <a class="nav-link" href="#memories">
+        <i data-lucide="brain"></i> Memory library
+      </a>
+      <a class="nav-link" href="#plan">
+        <i data-lucide="list-checks"></i> AI action plan
+      </a>
+      <a class="nav-link" href="#save">
+        <i data-lucide="archive"></i> Save resolution
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="mini-status">
+        <span class="dot" id="sidebarDot"></span>
+        <span id="sidebarStatus">Local workspace</span>
+      </div>
+      <p style="margin:7px 0 0;color:var(--muted);font-size:11px">
+        IncidentIQ connects past experience with today's problems.
+      </p>
+      <div class="tech-tags">
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">Hindsight</span>
+        <span class="tech-tag">Groq</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main" id="home">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-button mobile-menu" id="menuBtn"
+          aria-label="Open navigation">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="status-pill">
+          <span class="dot" id="statusDot"></span>
+          <span id="systemStatus">Checking workspace</span>
+        </div>
+        <span class="top-muted">FastAPI / Hindsight / Groq</span>
+      </div>
+
+      <div class="topbar-right">
+        <button class="icon-button" id="clearBtn" title="Clear current workspace"
+          aria-label="Clear current workspace">
+          <i data-lucide="rotate-ccw"></i>
+        </button>
+        <div class="avatar">IQ</div>
+        <span class="user-label" style="font-size:12px;color:#d8e4f7">
+          Engineer workspace
+        </span>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="welcome">
+        <div>
+          <div class="eyebrow">Incident intelligence platform</div>
+          <h1>Welcome to IncidentIQ<span style="color:var(--blue)">.</span></h1>
+          <p>Find the context. Investigate with confidence. Remember what works.</p>
+        </div>
+        <div class="date-chip">
+          <i data-lucide="shield-check"
+            style="width:14px;height:14px;vertical-align:middle;margin-right:5px"></i>
+          Human in the loop
+        </div>
+      </section>
+
+      <div class="dashboard-grid">
+
+        <div class="left-column">
+
+          <!-- Incident input -->
+          <section class="panel" id="incident">
+            <div class="panel-heading">
+              <div class="heading-main">
+                <div class="heading-icon"><i data-lucide="file-warning"></i></div>
+                <div>
+                  <h2>Describe the incident</h2>
+                  <p class="panel-description">
+                    Tell us what happened so we can find useful context.
+                  </p>
+                </div>
+              </div>
+              <span class="counter">01 / INPUT</span>
+            </div>
+
+            <form id="incidentForm">
+              <div class="field">
+                <label for="description">Incident description</label>
+                <textarea id="description" required minlength="5"
+                  placeholder="Example: After a deployment, the login API returns HTTP 503 errors. Users cannot sign in. The service worked normally before deployment."></textarea>
+                <p class="field-hint">
+                  Include error messages, affected services, timing and recent changes.
+                </p>
+              </div>
+
+              <div class="form-footer">
+                <span class="keyboard-hint">Be specific for more relevant results.</span>
+                <div class="button-group">
+                  <button type="submit" class="btn btn-primary" id="suggestBtn">
+                    <i data-lucide="sparkles"></i>
+                    Get AI suggestions
+                  </button>
+                  <button type="button" class="btn btn-secondary" id="recallBtn">
+                    <i data-lucide="search"></i>
+                    Recall memories
+                  </button>
+                </div>
+              </div>
+
+              <div class="progress-line" aria-hidden="true">
+                <span id="progressBar"></span>
+              </div>
+            </form>
+          </section>
+
+          <!-- Memory results -->
+          <section class="panel" id="memories">
+            <div class="panel-heading">
+              <div class="heading-main">
+                <div class="heading-icon purple">
+                  <i data-lucide="brain-circuit"></i>
+                </div>
+                <div>
+                  <h2>Retrieved memories</h2>
+                  <p class="panel-description">
+                    Relevant incidents from your organizational memory.
+                  </p>
+                </div>
+              </div>
+              <span class="counter" id="memoryCount">0 found</span>
+            </div>
+
+            <div class="memory-list" id="memoryList" aria-live="polite">
+              <div class="empty-state">
+                <i data-lucide="database"></i>
+                <strong>Your memory results will appear here</strong>
+                <p>Describe an incident and select Recall memories or Get AI suggestions.</p>
+              </div>
+            </div>
+
+            <button type="button" class="text-link" id="recallAgainBtn">
+              <i data-lucide="refresh-cw" style="width:14px;height:14px"></i>
+              Refresh recalled memories
+            </button>
+          </section>
+
+          <!-- AI plan -->
+          <section class="panel" id="plan">
+            <div class="panel-heading">
+              <div class="heading-main">
+                <div class="heading-icon purple">
+                  <i data-lucide="sparkles"></i>
+                </div>
+                <div>
+                  <h2>AI troubleshooting plan</h2>
+                  <p class="panel-description">
+                    Prioritized diagnostic guidance based on the incident context.
+                  </p>
+                </div>
+              </div>
+              <span class="counter blue" id="planStatus">Waiting</span>
+            </div>
+
+            <div id="planContent" aria-live="polite">
+              <div class="empty-state">
+                <i data-lucide="list-checks"></i>
+                <strong>No troubleshooting plan yet</strong>
+                <p>Submit an incident to generate a plan using retrieved memories.</p>
+              </div>
+            </div>
+
+            <div class="note">
+              <i data-lucide="shield-check"></i>
+              <span>
+                AI suggestions are guidance, not guaranteed diagnoses.
+                Review and verify each step before changing any system.
+              </span>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="right-column">
+
+          <!-- Workflow -->
+          <section class="panel">
+            <div class="panel-heading">
+              <div class="heading-main">
+                <div class="heading-icon green">
+                  <i data-lucide="workflow"></i>
+                </div>
+                <div>
+                  <h2>How it works</h2>
+                  <p class="panel-description">From incident to reusable knowledge.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="workflow">
+              <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div>
+                  <strong>Describe the problem</strong>
+                  <p>Enter the symptoms and relevant details.</p>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div>
+                  <strong>Recall past incidents</strong>
+                  <p>Hindsight searches stored incident memories.</p>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div>
+                  <strong>Generate a plan</strong>
+                  <p>Groq uses the incident and retrieved context.</p>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div>
+                  <strong>Review and verify</strong>
+                  <p>The engineer investigates and tests the fix.</p>
+                </div>
+              </div>
+              <div class="workflow-step">
+                <div class="step-number">5</div>
+                <div>
+                  <strong>Save the outcome</strong>
+                  <p>The resolution becomes available for future recall.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="learning-callout" style="margin-top:20px">
+              <i data-lucide="infinity"></i>
+              <p><strong>Continuous learning</strong><br />
+                Every documented outcome can help inform future investigations.
+              </p>
+            </div>
+          </section>
+
+          <!-- Save resolution -->
+          <section class="panel save-panel" id="save">
+            <div class="panel-heading">
+              <div class="heading-main">
+                <div class="heading-icon green">
+                  <i data-lucide="save"></i>
+                </div>
+                <div>
+                  <h2>Save the outcome</h2>
+                  <p class="panel-description">
+                    Record what happened for future reference.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <form id="saveForm">
+              <div class="field">
+                <label for="resolution">Resolution description</label>
+                <textarea id="resolution" required
+                  placeholder="What did you investigate? What fixed the problem? Which tests passed?"
+                  style="min-height:112px"></textarea>
+              </div>
+
+              <div class="field">
+                <label for="outcome">Incident outcome</label>
+                <select id="outcome" required>
+                  <option value="unresolved">Unresolved</option>
+                  <option value="partially_resolved">Partially resolved</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+
+              <label class="checkbox-row">
+                <input type="checkbox" id="verified" disabled />
+                <span>
+                  <strong>Resolution verified</strong><br />
+                  Mark only after confirming the fix and relevant tests.
+                </span>
+              </label>
+
+              <button type="submit" class="btn btn-success btn-full" id="saveBtn">
+                <i data-lucide="save"></i>
+                Save incident memory
+              </button>
+
+              <p class="save-hint">
+                Your current incident description is saved with the resolution.
+              </p>
+            </form>
+          </section>
+
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div class="footer-left">
+          <i data-lucide="shield-check"></i>
+          <span><strong>Human in the loop</strong> · You stay in control of every fix.</span>
+        </div>
+        <span>Built with FastAPI · Hindsight · Groq</span>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // Keep this URL consistent with your running FastAPI server.
+  const API = "http://127.0.0.1:8000";
+
+  const $ = (id) => document.getElementById(id);
+
+  let currentMemories = [];
+  let toastTimer;
+
+  function refreshIcons() {
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function showToast(message, isError = false) {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.classList.toggle("error", isError);
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 3600);
+  }
+
+  function setBusy(busy, message = "Working...") {
+    $("suggestBtn").disabled = busy;
+    $("recallBtn").disabled = busy;
+    $("recallAgainBtn").disabled = busy;
+    $("saveBtn").disabled = busy;
+
+    $("progressBar").style.width = busy ? "65%" : "0%";
+
+    if (busy) {
+      $("statusDot").className = "dot busy";
+      $("sidebarDot").className = "dot busy";
+      $("systemStatus").textContent = message;
+      $("sidebarStatus").textContent = "Request in progress";
+    } else {
+      $("statusDot").className = "dot";
+      $("sidebarDot").className = "dot";
+      $("systemStatus").textContent = "Workspace ready";
+      $("sidebarStatus").textContent = "Local workspace";
+    }
+  }
+
+  async function postIncident(endpoint, payload) {
+    let response;
+
+    try {
+      response = await fetch(`${API}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+    } catch {
+      throw new Error(
+        "Cannot connect to FastAPI. Make sure the backend is running on port 8000."
+      );
+    }
+
+    const raw = await response.text();
+    let data;
+
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = { detail: raw || "The server returned an empty response." };
+    }
+
+    if (!response.ok) {
+      const detail = data.detail || data.error || data.message;
+      throw new Error(
+        typeof detail === "string"
+          ? detail
+          : JSON.stringify(detail || `Request failed (${response.status})`)
+      );
+    }
+
+    return data;
+  }
+
+  function getMemoryText(memory) {
+    if (typeof memory === "string") return memory;
+    if (!memory || typeof memory !== "object") return "";
+
+    for (const key of ["text", "content", "fact", "memory"]) {
+      if (typeof memory[key] === "string" && memory[key].trim()) {
+        return memory[key].trim();
+      }
+    }
+
+    return JSON.stringify(memory, null, 2);
+  }
+
+  function getMemoriesFromResponse(data) {
+    if (Array.isArray(data.results)) return data.results;
+    if (Array.isArray(data.memories)) return data.memories;
+    return [];
+  }
+
+  function getMemoryOutcome(text) {
+    if (/partially[_ -]resolved/i.test(text)) return "partial";
+    if (/\bunresolved\b/i.test(text)) return "unresolved";
+    if (/\bresolved\b/i.test(text)) return "resolved";
+    return "";
+  }
+
+  function renderMemories(memories) {
+    currentMemories = Array.isArray(memories) ? memories : [];
+
+    $("memoryCount").textContent = `${currentMemories.length} found`;
+    const container = $("memoryList");
+    container.replaceChildren();
+
+    if (!currentMemories.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+
+      const icon = document.createElement("i");
+      icon.setAttribute("data-lucide", "search-x");
+
+      const heading = document.createElement("strong");
+      heading.textContent = "No memories returned";
+
+      const message = document.createElement("p");
+      message.textContent =
+        "Try adding more incident details or check whether Hindsight contains relevant records.";
+
+      empty.append(icon, heading, message);
+      container.appendChild(empty);
+      refreshIcons();
+      return;
+    }
+
+    currentMemories.forEach((memory, index) => {
+      const text = getMemoryText(memory) || "No text available";
+      const firstLine = text.split("\n").find(line => line.trim()) || text;
+      const title = firstLine
+        .replace(/^Incident:\s*/i, "")
+        .replace(/^[-*#\s]+/, "")
+        .slice(0, 110);
+
+      const card = document.createElement("article");
+      card.className = "memory-card";
+
+      const top = document.createElement("div");
+      top.className = "memory-top";
+
+      const titleElement = document.createElement("h3");
+      titleElement.className = "memory-title";
+      titleElement.textContent = title || `Incident memory ${index + 1}`;
+
+      const outcome = getMemoryOutcome(text);
+      const badge = document.createElement("span");
+      badge.className = `badge ${outcome}`;
+      badge.textContent = outcome
+        ? outcome === "partial"
+          ? "Partially resolved"
+          : outcome === "resolved"
+            ? "Resolved"
+            : "Unresolved"
+        : "Historical record";
+
+      top.append(titleElement, badge);
+
+      const summary = document.createElement("p");
+      summary.className = "memory-summary";
+      summary.textContent = text.length > 180
+        ? text.slice(0, 180).trimEnd() + "..."
+        : text;
+
+      const detail = document.createElement("div");
+      detail.className = "memory-detail";
+      detail.textContent = text;
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "memory-toggle";
+
+      const toggleIcon = document.createElement("i");
+      toggleIcon.setAttribute("data-lucide", "chevron-down");
+
+      const toggleText = document.createElement("span");
+      toggleText.textContent = "View full memory";
+
+      toggle.append(toggleIcon, toggleText);
+      toggle.addEventListener("click", () => {
+        const expanded = card.classList.toggle("expanded");
+        toggleText.textContent = expanded ? "Hide details" : "View full memory";
+        toggleIcon.setAttribute(
+          "data-lucide",
+          expanded ? "chevron-up" : "chevron-down"
+        );
+        refreshIcons();
+      });
+
+      card.append(top, summary, detail, toggle);
+      container.appendChild(card);
+    });
+
+    refreshIcons();
+  }
+
+  function normalizeSuggestions(suggestions) {
+    if (Array.isArray(suggestions)) return suggestions;
+
+    if (typeof suggestions === "string" && suggestions.trim()) {
+      // Keep ordinary multiline model output readable.
+      return suggestions
+        .split(/\n+/)
+        .map(line => line.replace(/^\s*(?:[-*•]|\d+[.)])\s*/, "").trim())
+        .filter(Boolean);
+    }
+
+    if (suggestions && typeof suggestions === "object") {
+      return Object.entries(suggestions).map(([key, value]) => ({
+        title: key,
+        description: typeof value === "string"
+          ? value
+          : JSON.stringify(value)
+      }));
+    }
+
+    return [];
+  }
+
+  function renderPlan(data) {
+    const container = $("planContent");
+    container.replaceChildren();
+
+    const suggestions = normalizeSuggestions(data.suggestions);
+    const note = typeof data.note === "string" ? data.note : "";
+
+    if (!suggestions.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+
+      const icon = document.createElement("i");
+      icon.setAttribute("data-lucide", "file-search");
+
+      const heading = document.createElement("strong");
+      heading.textContent = "No suggestions were returned";
+
+      const message = document.createElement("p");
+      message.textContent = note || "Try submitting the incident again.";
+
+      empty.append(icon, heading, message);
+      container.appendChild(empty);
+      $("planStatus").textContent = "No plan";
+      refreshIcons();
+      return;
+    }
+
+    const intro = document.createElement("p");
+    intro.className = "plan-intro";
+    intro.textContent =
+      `${suggestions.length} suggested step${suggestions.length === 1 ? "" : "s"} for your investigation.`;
+
+    const list = document.createElement("div");
+    list.className = "plan-list";
+
+    suggestions.forEach((item, index) => {
+      const entry = document.createElement("div");
+      entry.className = "plan-item";
+
+      const number = document.createElement("div");
+      number.className = "plan-number";
+      number.textContent = index + 1;
+
+      const body = document.createElement("div");
+
+      if (typeof item === "string") {
+        const text = item.trim();
+        const separator = text.indexOf(":");
+        const hasTitle = separator > 0 && separator < 65;
+
+        const title = document.createElement("div");
+        title.className = "plan-title";
+        title.textContent = hasTitle
+          ? text.slice(0, separator).trim()
+          : `Diagnostic step ${index + 1}`;
+
+        const description = document.createElement("p");
+        description.className = "plan-description";
+        description.textContent = hasTitle
+          ? text.slice(separator + 1).trim()
+          : text;
+
+        body.append(title, description);
+      } else {
+        const title = document.createElement("div");
+        title.className = "plan-title";
+        title.textContent = item.title || item.step || `Diagnostic step ${index + 1}`;
+
+        const description = document.createElement("p");
+        description.className = "plan-description";
+        description.textContent =
+          item.description || item.details || item.instruction ||
+          item.action || JSON.stringify(item);
+
+        body.append(title, description);
+      }
+
+      entry.append(number, body);
+      list.appendChild(entry);
+    });
+
+    container.append(intro, list);
+
+    if (note) {
+      const noteElement = document.createElement("p");
+      noteElement.className = "field-hint";
+      noteElement.style.marginTop = "12px";
+      noteElement.textContent = note;
+      container.appendChild(noteElement);
+    }
+
+    $("planStatus").textContent = "Plan ready";
+    $("planStatus").className = "counter green";
+    refreshIcons();
+  }
+
+  async function recallMemories() {
+    const description = $("description").value.trim();
+
+    if (!description) {
+      showToast("Enter an incident description first.", true);
+      $("description").focus();
+      return;
+    }
+
+    setBusy(true, "Recalling memories...");
+
+    try {
+      const data = await postIncident("/api/recall", { description });
+      renderMemories(getMemoriesFromResponse(data));
+      $("progressBar").style.width = "100%";
+      showToast(`Memory search complete: ${getMemoriesFromResponse(data).length} result(s).`);
+    } catch (error) {
+      showToast(error.message, true);
+      $("statusDot").className = "dot offline";
+      $("systemStatus").textContent = "Request failed";
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function getSuggestions() {
+    const description = $("description").value.trim();
+
+    if (description.length < 5) {
+      showToast("Please enter a more detailed incident description.", true);
+      $("description").focus();
+      return;
+    }
+
+    setBusy(true, "Generating suggestions...");
+    $("planStatus").textContent = "Working";
+
+    try {
+      const data = await postIncident("/api/suggest", { description });
+
+      renderMemories(
+        Array.isArray(data.memories_used)
+          ? data.memories_used
+          : getMemoriesFromResponse(data)
+      );
+
+      renderPlan(data);
+
+      $("progressBar").style.width = "100%";
+      showToast("Troubleshooting suggestions are ready.");
+
+      $("plan").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (error) {
+      $("planStatus").textContent = "Request failed";
+      showToast(error.message, true);
+      $("statusDot").className = "dot offline";
+      $("systemStatus").textContent = "Request failed";
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveResolution() {
+    const description = $("description").value.trim();
+    const resolution = $("resolution").value.trim();
+    const outcome = $("outcome").value;
+    const verified = $("verified").checked;
+
+    if (!description) {
+      showToast("Enter the incident description before saving.", true);
+      $("description").focus();
+      return;
+    }
+
+    if (!resolution) {
+      showToast("Describe the resolution or the investigation so far.", true);
+      $("resolution").focus();
+      return;
+    }
+
+    if (verified && outcome !== "resolved") {
+      showToast("Only resolved incidents can be marked verified.", true);
+      return;
+    }
+
+    setBusy(true, "Saving incident memory...");
+
+    try {
+      await postIncident("/api/retain", {
+        description,
+        resolution,
+        outcome,
+        verified
+      });
+
+      showToast("Incident outcome saved to Hindsight.");
+      $("resolution").value = "";
+      $("outcome").value = "unresolved";
+      $("verified").checked = false;
+      $("verified").disabled = true;
+    } catch (error) {
+      showToast(error.message, true);
+      $("statusDot").className = "dot offline";
+      $("systemStatus").textContent = "Request failed";
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function clearWorkspace() {
+    $("description").value = "";
+    $("resolution").value = "";
+    $("outcome").value = "unresolved";
+    $("verified").checked = false;
+    $("verified").disabled = true;
+
+    renderMemories([]);
+    $("planContent").innerHTML = `
+      <div class="empty-state">
+        <i data-lucide="list-checks"></i>
+        <strong>No troubleshooting plan yet</strong>
+        <p>Submit an incident to generate a plan using retrieved memories.</p>
+      </div>`;
+    $("planStatus").textContent = "Waiting";
+    $("planStatus").className = "counter blue";
+    $("progressBar").style.width = "0%";
+
+    refreshIcons();
+    showToast("Workspace cleared. Stored Hindsight memories were not deleted.");
+  }
+
+  $("incidentForm").addEventListener("submit", event => {
+    event.preventDefault();
+    getSuggestions();
+  });
+
+  $("recallBtn").addEventListener("click", recallMemories);
+  $("recallAgainBtn").addEventListener("click", recallMemories);
+  $("saveForm").addEventListener("submit", event => {
+    event.preventDefault();
+    saveResolution();
+  });
+  $("clearBtn").addEventListener("click", clearWorkspace);
+
+  $("outcome").addEventListener("change", () => {
+    const isResolved = $("outcome").value === "resolved";
+
+    $("verified").disabled = !isResolved;
+
+    if (!isResolved) $("verified").checked = false;
+  });
+
+  $("menuBtn").addEventListener("click", () => {
+    $("sidebar").classList.toggle("open");
+  });
+
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+      document.querySelectorAll(".nav-link").forEach(item => {
+        item.classList.remove("active");
+      });
+
+      link.classList.add("active");
+      $("sidebar").classList.remove("open");
+    });
+  });
+
+  // Check that the local backend is reachable.
+  async function checkBackend() {
+    try {
+      const response = await fetch(`${API}/health`);
+      if (!response.ok) throw new Error("Backend health check failed");
+
+      $("systemStatus").textContent = "Backend reachable";
+      $("sidebarStatus").textContent = "Backend reachable";
+      $("statusDot").className = "dot";
+      $("sidebarDot").className = "dot";
+    } catch {
+      $("systemStatus").textContent = "Backend not connected";
+      $("sidebarStatus").textContent = "Start FastAPI";
+      $("statusDot").className = "dot offline";
+      $("sidebarDot").className = "dot offline";
+    }
+  }
+
+  refreshIcons();
+  checkBackend();
+</script>
+</body>
+</html>
